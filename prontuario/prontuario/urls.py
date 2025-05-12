@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('pacientes/', views.pacientes, name='pacientes'),
+    path('pacientes/cadastrar/', views.cadastrar_paciente, name='cadastrar_paciente'),
     path('consultas/', views.consultas, name='consultas'),
     path('prontuarios/', views.prontuarios, name='prontuarios'),
     path('agenda/', views.agenda, name='agenda'),
