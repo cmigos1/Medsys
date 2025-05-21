@@ -30,11 +30,19 @@ class Paciente(models.Model):
 
 
 class Consulta(models.Model):
+    STATUS_CHOICES = [
+        ('PENDENTE', 'Pendente'),
+        ('CONFIRMADA', 'Confirmada'),
+        ('CANCELADA', 'Cancelada'),
+        ('ESPERA', 'Em Espera'),
+    ]
+
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     medico = models.ForeignKey(Medico, on_delete=models.SET_NULL, null=True)
     data = models.DateTimeField()
     motivo = models.TextField()
     concluida = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDENTE')  # novo campo
 
     def __str__(self):
         return f"Consulta de {self.paciente.nome} com {self.medico.nome} em {self.data.strftime('%d/%m/%Y %H:%M')}"

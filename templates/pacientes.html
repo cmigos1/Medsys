@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Pacientes - Sistema de Prontuário{% endblock %}
+{% block title %}Pacientes - MedSys{% endblock %}
 
 {% block content %}
 <div class="row mt-4">
@@ -32,15 +32,12 @@
                                 <td>{{ paciente.telefone }}</td>
                                 <td>{% if paciente.ultima_consulta %}{{ paciente.ultima_consulta|date:"d/m/Y" }}{% else %}Nenhuma{% endif %}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info">
+                                    <a href="{% url 'visualizar_paciente' paciente.id %}" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-warning">
+                                    </a>
+                                    <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
