@@ -28,6 +28,10 @@ urlpatterns = [
     path('pacientes/<int:paciente_id>/', views.visualizar_paciente, name='visualizar_paciente'),
     path('pacientes/<int:paciente_id>/editar/', views.editar_paciente, name='editar_paciente'),
     path('consultas/', views.consultas, name='consultas'),
+    path('consultas/cadastrar/', views.cadastrar_consulta, name='cadastrar_consulta'),
+    path('consultas/<int:consulta_id>/', views.visualizar_consulta, name='visualizar_consulta'),
+    path('consultas/<int:consulta_id>/editar/', views.editar_consulta, name='editar_consulta'),
+    path('consultas/<int:consulta_id>/cancelar/', views.cancelar_consulta, name='cancelar_consulta'),
     path('prontuarios/', views.prontuarios, name='prontuarios'),
     path('agenda/', views.agenda, name='agenda'),
 ]
