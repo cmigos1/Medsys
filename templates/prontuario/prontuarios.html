@@ -1,0 +1,121 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Prontuários - MedSys{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Prontuários</h5>
+                <a href="{% url 'cadastrar_prontuario' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Novo Prontuário
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <form method="GET">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="search" placeholder="Buscar paciente..." value="{{ request.GET.search }}">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Data do Prontuário</th>
+                                <th>Médico</th>
+                                <th>Especialidade</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prontuario in prontuarios %}
+                            <tr>
+                                <td>{{ prontuario.consulta.paciente.nome }}</td>
+                                <td>{{ prontuario.consulta.data|date:"d/m/Y" }}</td>
+                                <td>{{ prontuario.consulta.medico.nome }}</td>
+                                <td>{{ prontuario.consulta.medico.especialidade.nome }}</td>
+                                <td>
+                                    <span class="badge {% if prontuario.consulta.status == 'CONFIRMADA' %}bg-success{% elif prontuario.consulta.status == 'CANCELADA' %}bg-danger{% elif prontuario.consulta.status == 'ESPERA' %}bg-warning{% else %}bg-info{% endif %}">
+                                        {{ prontuario.consulta.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalVisualizarProntuario{{ prontuario.id }}" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{% url 'editar_prontuario' prontuario.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'imprimir_prontuario' prontuario.id %}" class="btn btn-sm btn-primary" target="_blank" title="Imprimir">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">Nenhum prontuário encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais para visualização dos prontuários -->
+{% for prontuario in prontuarios %}
+<div class="modal fade" id="modalVisualizarProntuario{{ prontuario.id }}" tabindex="-1" aria-labelledby="modalLabel{{ prontuario.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel{{ prontuario.id }}">Prontuário - {{ prontuario.consulta.data|date:"d/m/Y" }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Paciente:</strong> {{ prontuario.consulta.paciente.nome }}</p>
+                        <p><strong>Data da Consulta:</strong> {{ prontuario.consulta.data|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Médico:</strong> {{ prontuario.consulta.medico.nome }}</p>
+                        <p><strong>Especialidade:</strong> {{ prontuario.consulta.medico.especialidade.nome }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <h6>Diagnóstico:</h6>
+                        <p>{{ prontuario.diagnostico }}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <h6>Anotações:</h6>
+                        <p>{{ prontuario.anotacoes|default:"Nenhuma anotação registrada." }}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <h6>Prescrição:</h6>
+                        <p>{{ prontuario.prescricao|default:"Nenhuma prescrição registrada." }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <a href="{% url 'imprimir_prontuario' prontuario.id %}" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Imprimir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

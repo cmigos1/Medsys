@@ -1,0 +1,70 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Editar Consulta - MedSys{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Editar Consulta</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="paciente" class="form-label">Paciente</label>
+                            <select class="form-select" id="paciente" name="paciente" required>
+                                <option value="">Selecione um paciente</option>
+                                {% for paciente in pacientes %}
+                                <option value="{{ paciente.id }}" {% if paciente.id == consulta.paciente.id %}selected{% endif %}>
+                                    {{ paciente.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="medico" class="form-label">Médico</label>
+                            <select class="form-select" id="medico" name="medico" required>
+                                <option value="">Selecione um médico</option>
+                                {% for medico in medicos %}
+                                <option value="{{ medico.id }}" {% if medico.id == consulta.medico.id %}selected{% endif %}>
+                                    {{ medico.nome }} - {{ medico.especialidade.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="data" class="form-label">Data e Hora</label>
+                            <input type="datetime-local" class="form-control" id="data" name="data" 
+                                   value="{{ consulta.data|date:'Y-m-d\TH:i' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="PENDENTE" {% if consulta.status == 'PENDENTE' %}selected{% endif %}>Pendente</option>
+                                <option value="CONFIRMADA" {% if consulta.status == 'CONFIRMADA' %}selected{% endif %}>Confirmada</option>
+                                <option value="CANCELADA" {% if consulta.status == 'CANCELADA' %}selected{% endif %}>Cancelada</option>
+                                <option value="ESPERA" {% if consulta.status == 'ESPERA' %}selected{% endif %}>Em Espera</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="motivo" class="form-label">Motivo da Consulta</label>
+                            <textarea class="form-control" id="motivo" name="motivo" rows="3" required>{{ consulta.motivo }}</textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'consultas' %}" class="btn btn-secondary me-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

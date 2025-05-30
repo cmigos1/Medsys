@@ -1,0 +1,55 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Novo Prontuário - MedSys{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Novo Prontuário</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="consulta" class="form-label">Consulta</label>
+                            <select class="form-select" id="consulta" name="consulta" required>
+                                <option value="">Selecione uma consulta</option>
+                                {% for consulta in consultas %}
+                                <option value="{{ consulta.id }}">
+                                    {{ consulta.paciente.nome }} - {{ consulta.medico.nome }} - {{ consulta.data|date:"d/m/Y H:i" }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="diagnostico" class="form-label">Diagnóstico</label>
+                            <textarea class="form-control" id="diagnostico" name="diagnostico" rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="anotacoes" class="form-label">Anotações</label>
+                            <textarea class="form-control" id="anotacoes" name="anotacoes" rows="4"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="prescricao" class="form-label">Prescrição</label>
+                            <textarea class="form-control" id="prescricao" name="prescricao" rows="4"></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'prontuarios' %}" class="btn btn-secondary me-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Criar Prontuário</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
