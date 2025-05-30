@@ -17,7 +17,23 @@ def consultas(request):
     return render(request, 'consultas.html', {'consultas': consultas})
 
 def prontuarios(request):
-    return render(request, 'prontuarios.html')
+    search = request.GET.get('search', '')
+    prontuarios = Prontuario.objects.select_related(
+        'consulta__paciente', 
+        'consulta__medico', 
+        'consulta__medico__especialidade'
+    ).all()
+    
+    if search:
+        prontuarios = prontuarios.filter(
+            consulta__paciente__nome__icontains=search
+        )
+    
+    prontuarios = prontuarios.order_by('-consulta__data')
+    
+    return render(request, 'prontuarios.html', {
+        'prontuarios': prontuarios
+    })
 
 def agenda(request):
     return render(request, 'agenda.html')
@@ -157,3 +173,60 @@ def cancelar_consulta(request, consulta_id):
             messages.error(request, f'Erro ao cancelar consulta: {str(e)}')
     
     return redirect('consultas')
+
+def cadastrar_prontuario(request):
+    if request.method == 'POST':
+        try:
+            consulta_id = request.POST.get('consulta')
+            diagnostico = request.POST.get('diagnostico')
+            anotacoes = request.POST.get('anotacoes')
+            prescricao = request.POST.get('prescricao')
+            
+            consulta = get_object_or_404(Consulta, id=consulta_id)
+            
+            Prontuario.objects.create(
+                consulta=consulta,
+                diagnostico=diagnostico,
+                anotacoes=anotacoes,
+                prescricao=prescricao
+            )
+            
+            messages.success(request, 'Prontuário criado com sucesso!')
+            return redirect('prontuarios')
+        except Exception as e:
+            messages.error(request, f'Erro ao criar prontuário: {str(e)}')
+    
+    # Buscar apenas consultas que não têm prontuário
+    consultas_sem_prontuario = Consulta.objects.filter(
+        prontuario__isnull=True,
+        status='CONFIRMADA'
+    ).select_related('paciente', 'medico', 'medico__especialidade')
+    
+    return render(request, 'cadastrar_prontuario.html', {
+        'consultas': consultas_sem_prontuario
+    })
+
+def editar_prontuario(request, prontuario_id):
+    prontuario = get_object_or_404(Prontuario, id=prontuario_id)
+    
+    if request.method == 'POST':
+        try:
+            prontuario.diagnostico = request.POST.get('diagnostico')
+            prontuario.anotacoes = request.POST.get('anotacoes')
+            prontuario.prescricao = request.POST.get('prescricao')
+            prontuario.save()
+            
+            messages.success(request, 'Prontuário atualizado com sucesso!')
+            return redirect('prontuarios')
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar prontuário: {str(e)}')
+    
+    return render(request, 'editar_prontuario.html', {
+        'prontuario': prontuario
+    })
+
+def imprimir_prontuario(request, prontuario_id):
+    prontuario = get_object_or_404(Prontuario, id=prontuario_id)
+    return render(request, 'imprimir_prontuario.html', {
+        'prontuario': prontuario
+    })

@@ -35,6 +35,7 @@ class Consulta(models.Model):
         ('CONFIRMADA', 'Confirmada'),
         ('CANCELADA', 'Cancelada'),
         ('ESPERA', 'Em Espera'),
+        ('FINALIZADA', 'Finalizada'),
     ]
 
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
