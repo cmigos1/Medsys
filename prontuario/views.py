@@ -10,11 +10,19 @@ def pacientes(request):
     pacientes = Paciente.objects.annotate(
         ultima_consulta=Max('consulta__data')
     ).all()
+<<<<<<< HEAD
     return render(request, 'pacientes.html', {'pacientes': pacientes})
 
 def consultas(request):
     consultas = Consulta.objects.select_related('paciente', 'medico', 'medico__especialidade').order_by('data')
     return render(request, 'consultas.html', {'consultas': consultas})
+=======
+    return render(request, 'pacientes/pacientes.html', {'pacientes': pacientes})
+
+def consultas(request):
+    consultas = Consulta.objects.select_related('paciente', 'medico', 'medico__especialidade').order_by('data')
+    return render(request, 'consultas/consultas.html', {'consultas': consultas})
+>>>>>>> teste
 
 def prontuarios(request):
     search = request.GET.get('search', '')
@@ -31,12 +39,20 @@ def prontuarios(request):
     
     prontuarios = prontuarios.order_by('-consulta__data')
     
+<<<<<<< HEAD
     return render(request, 'prontuarios.html', {
+=======
+    return render(request, 'prontuario/prontuarios.html', {
+>>>>>>> teste
         'prontuarios': prontuarios
     })
 
 def agenda(request):
+<<<<<<< HEAD
     return render(request, 'agenda.html')
+=======
+    return render(request, 'agenda/agenda.html')
+>>>>>>> teste
 
 def cadastrar_paciente(request):
     if request.method == 'POST':
@@ -59,7 +75,11 @@ def cadastrar_paciente(request):
         except Exception as e:
             messages.error(request, f'Erro ao cadastrar paciente: {str(e)}')
     
+<<<<<<< HEAD
     return render(request, 'cadastrar_paciente.html')
+=======
+    return render(request, 'pacientes/cadastrar_paciente.html')
+>>>>>>> teste
 
 def visualizar_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
@@ -74,7 +94,11 @@ def visualizar_paciente(request, paciente_id):
         consulta__paciente=paciente
     ).select_related('consulta', 'consulta__medico').order_by('-consulta__data')
     
+<<<<<<< HEAD
     return render(request, 'visualizar_paciente.html', {
+=======
+    return render(request, 'pacientes/visualizar_paciente.html', {
+>>>>>>> teste
         'paciente': paciente,
         'consultas': consultas,
         'prontuarios': prontuarios
@@ -97,7 +121,11 @@ def editar_paciente(request, paciente_id):
         except Exception as e:
             messages.error(request, f'Erro ao atualizar paciente: {str(e)}')
     
+<<<<<<< HEAD
     return render(request, 'editar_paciente.html', {'paciente': paciente})
+=======
+    return render(request, 'pacientes/editar_paciente.html', {'paciente': paciente})
+>>>>>>> teste
 
 def cadastrar_consulta(request):
     if request.method == 'POST':
@@ -124,7 +152,11 @@ def cadastrar_consulta(request):
     
     pacientes = Paciente.objects.all()
     medicos = Medico.objects.select_related('especialidade').all()
+<<<<<<< HEAD
     return render(request, 'cadastrar_consulta.html', {
+=======
+    return render(request, 'consultas/cadastrar_consulta.html', {
+>>>>>>> teste
         'pacientes': pacientes,
         'medicos': medicos
     })
@@ -134,7 +166,11 @@ def visualizar_consulta(request, consulta_id):
         'paciente', 'medico', 'medico__especialidade'
     ), id=consulta_id)
     
+<<<<<<< HEAD
     return render(request, 'visualizar_consulta.html', {'consulta': consulta})
+=======
+    return render(request, 'consultas/visualizar_consulta.html', {'consulta': consulta})
+>>>>>>> teste
 
 def editar_consulta(request, consulta_id):
     consulta = get_object_or_404(Consulta, id=consulta_id)
@@ -155,7 +191,11 @@ def editar_consulta(request, consulta_id):
     
     pacientes = Paciente.objects.all()
     medicos = Medico.objects.select_related('especialidade').all()
+<<<<<<< HEAD
     return render(request, 'editar_consulta.html', {
+=======
+    return render(request, 'consultas/editar_consulta.html', {
+>>>>>>> teste
         'consulta': consulta,
         'pacientes': pacientes,
         'medicos': medicos
@@ -202,7 +242,11 @@ def cadastrar_prontuario(request):
         status='CONFIRMADA'
     ).select_related('paciente', 'medico', 'medico__especialidade')
     
+<<<<<<< HEAD
     return render(request, 'cadastrar_prontuario.html', {
+=======
+    return render(request, 'prontuario/cadastrar_prontuario.html', {
+>>>>>>> teste
         'consultas': consultas_sem_prontuario
     })
 
@@ -221,12 +265,20 @@ def editar_prontuario(request, prontuario_id):
         except Exception as e:
             messages.error(request, f'Erro ao atualizar prontuário: {str(e)}')
     
+<<<<<<< HEAD
     return render(request, 'editar_prontuario.html', {
+=======
+    return render(request, 'prontuario/editar_prontuario.html', {
+>>>>>>> teste
         'prontuario': prontuario
     })
 
 def imprimir_prontuario(request, prontuario_id):
     prontuario = get_object_or_404(Prontuario, id=prontuario_id)
+<<<<<<< HEAD
     return render(request, 'imprimir_prontuario.html', {
+=======
+    return render(request, 'prontuario/imprimir_prontuario.html', {
+>>>>>>> teste
         'prontuario': prontuario
     })
