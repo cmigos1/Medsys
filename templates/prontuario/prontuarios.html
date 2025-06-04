@@ -45,7 +45,7 @@
                                 <td>{{ prontuario.consulta.medico.nome }}</td>
                                 <td>{{ prontuario.consulta.medico.especialidade.nome }}</td>
                                 <td>
-                                    <span class="badge {% if prontuario.consulta.status == 'CONFIRMADA' %}bg-success{% elif prontuario.consulta.status == 'CANCELADA' %}bg-danger{% elif prontuario.consulta.status == 'ESPERA' %}bg-warning{% else %}bg-info{% endif %}">
+                                    <span class="badge {% if prontuario.consulta.status == 'CONFIRMADA' %}bg-success{% elif prontuario.consulta.status == 'CANCELADA' %}bg-danger{% elif prontuario.consulta.status == 'ESPERA' %}bg-warning{% elif prontuario.consulta.status == 'FINALIZADA' %}bg-dark{% else %}bg-info{% endif %}">
                                         {{ prontuario.consulta.get_status_display }}
                                     </span>
                                 </td>

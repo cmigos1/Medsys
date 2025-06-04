@@ -41,18 +41,35 @@
                                         <span class="badge bg-danger">Cancelada</span>
                                     {% elif consulta.status == 'ESPERA' %}
                                         <span class="badge bg-info">Em Espera</span>
+                                    {% elif consulta.status == 'FINALIZADA' %}
+                                        <span class="badge bg-dark">Finalizada</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{% url 'visualizar_consulta' consulta.id %}" class="btn btn-sm btn-info">
+                                    <a href="{% url 'visualizar_consulta' consulta.id %}" class="btn btn-sm btn-info" title="Visualizar">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{% url 'editar_consulta' consulta.id %}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{% url 'cancelar_consulta' consulta.id %}" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-times"></i>
-                                    </a>
+                                    {% if consulta.status != 'CANCELADA' and consulta.status != 'FINALIZADA' %}
+                                        <a href="{% url 'editar_consulta' consulta.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    {% endif %}
+                                    {% if consulta.status == 'CONFIRMADA' %}
+                                        <form method="POST" action="{% url 'finalizar_consulta' consulta.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success" title="Finalizar" onclick="return confirm('Tem certeza que deseja finalizar esta consulta?')">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    {% if consulta.status != 'CANCELADA' and consulta.status != 'FINALIZADA' %}
+                                        <form method="POST" action="{% url 'cancelar_consulta' consulta.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Cancelar" onclick="return confirm('Tem certeza que deseja cancelar esta consulta?')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% empty %}
@@ -67,4 +84,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
