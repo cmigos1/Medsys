@@ -68,6 +68,3 @@ Medsys/
 
 7. Acesse o sistema em: [http://localhost:8000](http://localhost:8000)
 
-## 📄 Licença
-
-Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais informações.
