@@ -37,6 +37,8 @@ urlpatterns = [
     path('consultas/<int:consulta_id>/', views.visualizar_consulta, name='visualizar_consulta'),
     path('consultas/<int:consulta_id>/editar/', views.editar_consulta, name='editar_consulta'),
     path('consultas/<int:consulta_id>/cancelar/', views.cancelar_consulta, name='cancelar_consulta'),
+    path('consultas/<int:consulta_id>/confirmar/', views.confirmar_consulta, name='confirmar_consulta'),
+    path('consultas/<int:consulta_id>/espera/', views.colocar_em_espera, name='colocar_em_espera'),
     path('consultas/<int:consulta_id>/finalizar/', views.finalizar_consulta, name='finalizar_consulta'),
     
     # URLs de Prontuários

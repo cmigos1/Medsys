@@ -95,12 +95,10 @@ def dashboard(request):
             context.update({
                 'total_pacientes_medico': consultas_medico.values('paciente').distinct().count(),
                 'consultas_hoje_medico': consultas_medico.filter(data__date=hoje).count(),
-                'proximas_consultas_medico': consultas_medico.filter(
-                    data__date=hoje, 
-                    data__time__gte=timezone.now().time()
-                ).count(),
+                'consultas_em_espera': consultas_medico.filter(status='ESPERA').count(),
                 'total_prontuarios_medico': Prontuario.objects.filter(consulta__medico=medico).count(),
                 'consultas_medico_hoje': consultas_medico.filter(data__date=hoje).order_by('data')[:5],
+                'consultas_espera': consultas_medico.filter(status='ESPERA').order_by('data')[:5],
                 'ultimos_prontuarios_medico': Prontuario.objects.filter(
                     consulta__medico=medico
                 ).order_by('-consulta__data')[:5]
@@ -111,9 +109,10 @@ def dashboard(request):
             context.update({
                 'total_pacientes_medico': 0,
                 'consultas_hoje_medico': 0,
-                'proximas_consultas_medico': 0,
+                'consultas_em_espera': 0,
                 'total_prontuarios_medico': 0,
                 'consultas_medico_hoje': [],
+                'consultas_espera': [],
                 'ultimos_prontuarios_medico': []
             })
     
@@ -355,12 +354,49 @@ def cancelar_consulta(request, consulta_id):
             return redirect('consultas')
     
     if request.method == 'POST':
-        try:
-            consulta.status = 'CANCELADA'
-            consulta.save()
-            messages.success(request, 'Consulta cancelada com sucesso!')
-        except Exception as e:
-            messages.error(request, f'Erro ao cancelar consulta: {str(e)}')
+        if consulta.pode_ser_cancelada():
+            try:
+                consulta.status = 'CANCELADA'
+                consulta.save()
+                messages.success(request, 'Consulta cancelada com sucesso!')
+            except Exception as e:
+                messages.error(request, f'Erro ao cancelar consulta: {str(e)}')
+        else:
+            messages.error(request, 'Esta consulta não pode ser cancelada.')
+    
+    return redirect('consultas')
+
+@recepcionista_or_admin_required
+def confirmar_consulta(request, consulta_id):
+    consulta = get_object_or_404(Consulta, id=consulta_id)
+    
+    if request.method == 'POST':
+        if consulta.pode_ser_confirmada():
+            try:
+                consulta.status = 'CONFIRMADA'
+                consulta.save()
+                messages.success(request, 'Consulta confirmada com sucesso!')
+            except Exception as e:
+                messages.error(request, f'Erro ao confirmar consulta: {str(e)}')
+        else:
+            messages.error(request, 'Esta consulta não pode ser confirmada.')
+    
+    return redirect('consultas')
+
+@recepcionista_or_admin_required
+def colocar_em_espera(request, consulta_id):
+    consulta = get_object_or_404(Consulta, id=consulta_id)
+    
+    if request.method == 'POST':
+        if consulta.pode_ir_para_espera():
+            try:
+                consulta.status = 'ESPERA'
+                consulta.save()
+                messages.success(request, 'Consulta colocada em espera! O médico já pode atender.')
+            except Exception as e:
+                messages.error(request, f'Erro ao colocar consulta em espera: {str(e)}')
+        else:
+            messages.error(request, 'Esta consulta não pode ser colocada em espera.')
     
     return redirect('consultas')
 
@@ -379,13 +415,16 @@ def finalizar_consulta(request, consulta_id):
             return redirect('consultas')
     
     if request.method == 'POST':
-        try:
-            consulta.status = 'FINALIZADA'
-            consulta.concluida = True
-            consulta.save()
-            messages.success(request, 'Consulta finalizada com sucesso!')
-        except Exception as e:
-            messages.error(request, f'Erro ao finalizar consulta: {str(e)}')
+        if consulta.pode_ser_finalizada():
+            try:
+                consulta.status = 'FINALIZADA'
+                consulta.concluida = True
+                consulta.save()
+                messages.success(request, 'Consulta finalizada com sucesso!')
+            except Exception as e:
+                messages.error(request, f'Erro ao finalizar consulta: {str(e)}')
+        else:
+            messages.error(request, 'Esta consulta não pode ser finalizada. Certifique-se de que está em espera e possui prontuário.')
     
     return redirect('consultas')
 
@@ -442,6 +481,12 @@ def cadastrar_prontuario(request):
                     messages.error(request, 'Perfil de médico não configurado.')
                     return redirect('prontuarios')
             
+            # Verificar se a consulta pode ter prontuário
+            if not consulta.pode_ter_prontuario():
+                messages.error(request, 'Só é possível criar prontuário para consultas em espera.')
+                return redirect('prontuarios')
+            
+            # Criar o prontuário
             Prontuario.objects.create(
                 consulta=consulta,
                 diagnostico=diagnostico,
@@ -449,30 +494,35 @@ def cadastrar_prontuario(request):
                 prescricao=prescricao
             )
             
-            messages.success(request, 'Prontuário criado com sucesso!')
+            # Automaticamente finalizar a consulta após criar o prontuário
+            consulta.status = 'FINALIZADA'
+            consulta.concluida = True
+            consulta.save()
+            
+            messages.success(request, 'Prontuário criado com sucesso! A consulta foi finalizada automaticamente.')
             return redirect('prontuarios')
         except Exception as e:
             messages.error(request, f'Erro ao criar prontuário: {str(e)}')
     
-    # Filtrar consultas baseado no tipo de usuário
+    # Filtrar consultas baseado no tipo de usuário - apenas consultas em espera
     if request.user.user_type == 'medico':
         try:
             medico = request.user.medico_profile
-            consultas_sem_prontuario = Consulta.objects.filter(
+            consultas_disponiveis = Consulta.objects.filter(
                 medico=medico,
                 prontuario__isnull=True,
-                status__in=['CONFIRMADA', 'FINALIZADA']
+                status='ESPERA'
             ).select_related('paciente', 'medico', 'medico__especialidade')
         except:
-            consultas_sem_prontuario = Consulta.objects.none()
+            consultas_disponiveis = Consulta.objects.none()
     else:
-        consultas_sem_prontuario = Consulta.objects.filter(
+        consultas_disponiveis = Consulta.objects.filter(
             prontuario__isnull=True,
-            status__in=['CONFIRMADA', 'FINALIZADA']
+            status='ESPERA'
         ).select_related('paciente', 'medico', 'medico__especialidade')
     
     return render(request, 'prontuario/cadastrar_prontuario.html', {
-        'consultas': consultas_sem_prontuario
+        'consultas': consultas_disponiveis
     })
 
 @medico_or_admin_required
@@ -525,13 +575,71 @@ def imprimir_prontuario(request, prontuario_id):
 
 @all_authenticated_required
 def agenda(request):
+    from datetime import datetime, timedelta
+    from django.db.models import Count, Q
+    import calendar
+    
+    # Obter data atual
+    hoje = timezone.now().date()
+    
+    # Filtrar consultas baseado no tipo de usuário
     if request.user.user_type == 'medico':
         try:
             medico = request.user.medico_profile
-            consultas = Consulta.objects.filter(medico=medico).select_related('paciente')
+            consultas_base = Consulta.objects.filter(medico=medico)
         except:
-            consultas = Consulta.objects.none()
+            consultas_base = Consulta.objects.none()
+            messages.warning(request, 'Perfil de médico não configurado.')
     else:
-        consultas = Consulta.objects.select_related('paciente', 'medico')
+        # Admin e recepcionista veem todas as consultas
+        consultas_base = Consulta.objects.all()
     
-    return render(request, 'agenda/agenda.html', {'consultas': consultas})
+    consultas_base = consultas_base.select_related('paciente', 'medico', 'medico__especialidade')
+    
+    # Estatísticas do dia
+    consultas_hoje = consultas_base.filter(data__date=hoje)
+    stats = {
+        'total_hoje': consultas_hoje.count(),
+        'confirmadas': consultas_hoje.filter(status='CONFIRMADA').count(),
+        'pendentes': consultas_hoje.filter(status='PENDENTE').count(),
+        'canceladas': consultas_hoje.filter(status='CANCELADA').count(),
+        'finalizadas': consultas_hoje.filter(status='FINALIZADA').count(),
+    }
+    
+    # Consultas da semana atual
+    inicio_semana = hoje - timedelta(days=hoje.weekday())
+    fim_semana = inicio_semana + timedelta(days=6)
+    
+    consultas_semana = consultas_base.filter(
+        data__date__range=[inicio_semana, fim_semana]
+    ).order_by('data')
+    
+    # Próximas consultas (próximos 5 dias)
+    proximas_consultas = consultas_base.filter(
+        data__gte=timezone.now(),
+        status__in=['CONFIRMADA', 'PENDENTE']
+    ).order_by('data')[:10]
+    
+    # Organizar consultas por dia para facilitar o template
+    consultas_por_dia = {}
+    for i in range(7):
+        data_dia = inicio_semana + timedelta(days=i)
+        consultas_por_dia[data_dia.strftime('%Y-%m-%d')] = []
+    
+    # Agrupar consultas por dia
+    for consulta in consultas_semana:
+        data_str = consulta.data.strftime('%Y-%m-%d')
+        if data_str in consultas_por_dia:
+            consultas_por_dia[data_str].append(consulta)
+    
+    context = {
+        'stats': stats,
+        'consultas_por_dia': consultas_por_dia,
+        'consultas_semana': consultas_semana,
+        'proximas_consultas': proximas_consultas,
+        'inicio_semana': inicio_semana,
+        'fim_semana': fim_semana,
+        'hoje': hoje,
+    }
+    
+    return render(request, 'agenda/agenda.html', context)

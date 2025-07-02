@@ -64,6 +64,54 @@ class Consulta(models.Model):
     motivo = models.TextField()
     concluida = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDENTE')
+    
+    # Métodos de verificação de status
+    def pode_ser_confirmada(self):
+        return self.status == 'PENDENTE'
+    
+    def pode_ser_cancelada(self):
+        return self.status in ['PENDENTE', 'CONFIRMADA']
+    
+    def pode_ir_para_espera(self):
+        return self.status == 'CONFIRMADA'
+    
+    def pode_ter_prontuario(self):
+        return self.status == 'ESPERA'
+    
+    def pode_ser_finalizada(self):
+        return self.status == 'ESPERA' and hasattr(self, 'prontuario')
+    
+    # Métodos alternativos com nomes em inglês (para compatibilidade)
+    def can_confirm(self):
+        return self.pode_ser_confirmada()
+    
+    def can_cancel(self):
+        return self.pode_ser_cancelada()
+    
+    def can_go_to_espera(self):
+        return self.pode_ir_para_espera()
+    
+    def can_have_prontuario(self):
+        return self.pode_ter_prontuario()
+    
+    def can_finalize(self):
+        return self.pode_ser_finalizada()
+    
+    # Métodos de verificação de status atual
+    def is_pending(self):
+        return self.status == 'PENDENTE'
+    
+    def is_confirmed(self):
+        return self.status == 'CONFIRMADA'
+    
+    def is_waiting(self):
+        return self.status == 'ESPERA'
+    
+    def is_finished(self):
+        return self.status == 'FINALIZADA'
+    
+    def is_cancelled(self):
+        return self.status == 'CANCELADA'
 
     def __str__(self):
         return f"{self.paciente.nome} - {self.medico.nome} - {self.data.strftime('%d/%m/%Y')}"

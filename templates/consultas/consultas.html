@@ -46,30 +46,59 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{% url 'visualizar_consulta' consulta.id %}" class="btn btn-sm btn-info" title="Visualizar">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    {% if consulta.status != 'CANCELADA' and consulta.status != 'FINALIZADA' %}
-                                        <a href="{% url 'editar_consulta' consulta.id %}" class="btn btn-sm btn-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                    <div class="btn-group" role="group">
+                                        <!-- Botão Visualizar -->
+                                        <a href="{% url 'visualizar_consulta' consulta.id %}" class="btn btn-sm btn-info" title="Visualizar">
+                                            <i class="fas fa-eye"></i>
                                         </a>
-                                    {% endif %}
-                                    {% if consulta.status == 'CONFIRMADA' %}
-                                        <form method="POST" action="{% url 'finalizar_consulta' consulta.id %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-success" title="Finalizar" onclick="return confirm('Tem certeza que deseja finalizar esta consulta?')">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                    {% if consulta.status != 'CANCELADA' and consulta.status != 'FINALIZADA' %}
-                                        <form method="POST" action="{% url 'cancelar_consulta' consulta.id %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Cancelar" onclick="return confirm('Tem certeza que deseja cancelar esta consulta?')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                    {% endif %}
+                                        
+                                        <!-- Botões para Recepcionista/Admin -->
+                                        {% if user.user_type != 'medico' %}
+                                            {% if consulta.status == 'PENDENTE' %}
+                                                <!-- Confirmar consulta -->
+                                                <form method="POST" action="{% url 'confirmar_consulta' consulta.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-primary" title="Confirmar" onclick="return confirm('Confirmar esta consulta?')">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            {% elif consulta.status == 'CONFIRMADA' %}
+                                                <!-- Colocar em espera -->
+                                                <form method="POST" action="{% url 'colocar_em_espera' consulta.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-warning" title="Colocar em Espera" onclick="return confirm('Colocar paciente em espera?')">
+                                                        <i class="fas fa-hourglass-half"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            
+                                            {% if consulta.status not in 'CANCELADA,FINALIZADA' %}
+                                                <a href="{% url 'editar_consulta' consulta.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        
+                                        <!-- Botões para Médico -->
+                                        {% if user.user_type == 'medico' %}
+                                            {% if consulta.status == 'ESPERA' %}
+                                                <!-- Criar prontuário -->
+                                                <a href="{% url 'cadastrar_prontuario' %}?consulta_id={{ consulta.id }}" class="btn btn-sm btn-success" title="Criar Prontuário">
+                                                    <i class="fas fa-file-medical"></i>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        
+                                        <!-- Botão Cancelar (para todos, exceto se já cancelada/finalizada) -->
+                                        {% if consulta.status not in 'CANCELADA,FINALIZADA' %}
+                                            <form method="POST" action="{% url 'cancelar_consulta' consulta.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Cancelar" onclick="return confirm('Tem certeza que deseja cancelar esta consulta?')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}
@@ -79,6 +108,40 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Legenda dos Status -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Fluxo dos Status</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary me-2">Pendente</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span class="badge bg-primary me-2">Confirmada</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span class="badge bg-warning me-2">Em Espera</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span class="badge bg-success">Finalizada</span>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-danger">Cancelada</span>
+                        <small class="text-muted ms-2">(pode ser cancelada a qualquer momento)</small>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <strong>Fluxo:</strong> 
+                        Recepcionista confirma → Coloca em espera → Médico atende e cria prontuário → Consulta finalizada automaticamente
+                    </small>
                 </div>
             </div>
         </div>

@@ -119,10 +119,13 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <div class="text-warning mb-3">
-                        <i class="fas fa-clock fa-3x"></i>
+                        <i class="fas fa-hourglass-half fa-3x"></i>
                     </div>
-                    <h4 class="card-title">{{ proximas_consultas_medico|default:0 }}</h4>
-                    <p class="card-text text-muted">Próximas Consultas</p>
+                    <h4 class="card-title">{{ consultas_em_espera|default:0 }}</h4>
+                    <p class="card-text text-muted">Aguardando Atendimento</p>
+                    {% if consultas_em_espera > 0 %}
+                    <a href="{% url 'cadastrar_prontuario' %}" class="btn btn-warning btn-sm">Atender Agora</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -139,6 +142,49 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Seção específica para médicos - Consultas em Espera -->
+    {% if consultas_espera %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Pacientes Aguardando Atendimento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for consulta in consultas_espera %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ consulta.paciente.nome }}</h6>
+                                            <p class="card-text small text-muted mb-1">
+                                                <i class="fas fa-calendar me-1"></i>{{ consulta.data|date:"d/m/Y H:i" }}
+                                            </p>
+                                            <p class="card-text small">{{ consulta.motivo|truncatechars:50 }}</p>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'cadastrar_prontuario' %}" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-stethoscope"></i> Atender
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     {% else %}
         <!-- Dashboard da Recepcionista -->

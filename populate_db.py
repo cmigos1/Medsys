@@ -89,13 +89,65 @@ def create_initial_data():
             'endereco': 'Rua B, 456, São Paulo - SP'
         }
     ]
-    
+
+    pacientes_criados = []
     for paciente_data in pacientes_exemplo:
-        Paciente.objects.get_or_create(
+        paciente, created = Paciente.objects.get_or_create(
             cpf=paciente_data['cpf'],
             defaults=paciente_data
         )
+        pacientes_criados.append(paciente)
     
+    # Criar consultas de exemplo
+    from clinica.models import Consulta
+    from datetime import datetime, timedelta
+    from django.utils import timezone
+    
+    # Obter o médico criado
+    try:
+        medico = Medico.objects.get(user=medico_user)
+        
+        # Criar algumas consultas em diferentes status
+        consultas_exemplo = [
+            {
+                'paciente': pacientes_criados[0],
+                'medico': medico,
+                'data': timezone.now() + timedelta(hours=1),
+                'motivo': 'Consulta de rotina - Check-up',
+                'status': 'PENDENTE'
+            },
+            {
+                'paciente': pacientes_criados[1],
+                'medico': medico,
+                'data': timezone.now() + timedelta(hours=2),
+                'motivo': 'Dor no peito - Emergência',
+                'status': 'ESPERA'
+            },
+            {
+                'paciente': pacientes_criados[0],
+                'medico': medico,
+                'data': timezone.now() + timedelta(days=1),
+                'motivo': 'Retorno cardiologia',
+                'status': 'CONFIRMADA'
+            }
+        ]
+        
+        for consulta_data in consultas_exemplo:
+            Consulta.objects.get_or_create(
+                paciente=consulta_data['paciente'],
+                medico=consulta_data['medico'],
+                data=consulta_data['data'],
+                defaults={
+                    'motivo': consulta_data['motivo'],
+                    'status': consulta_data['status']
+                }
+            )
+        
+        print("Consultas de exemplo criadas!")
+        
+    except Exception as e:
+        print(f"Erro ao criar consultas: {e}")
+
     print("Dados iniciais criados com sucesso!")
     print("Usuários criados:")
     print("- Admin: admin / admin123")

@@ -14,15 +14,33 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label for="consulta" class="form-label">Consulta</label>
-                            <select class="form-select" id="consulta" name="consulta" required>
-                                <option value="">Selecione uma consulta</option>
-                                {% for consulta in consultas %}
-                                <option value="{{ consulta.id }}">
-                                    {{ consulta.paciente.nome }} - {{ consulta.medico.nome }} - {{ consulta.data|date:"d/m/Y H:i" }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                            <label for="consulta" class="form-label">Consulta em Espera</label>
+                            {% if consultas %}
+                                <select class="form-select" id="consulta" name="consulta" required>
+                                    <option value="">Selecione uma consulta</option>
+                                    {% for consulta in consultas %}
+                                    <option value="{{ consulta.id }}" {% if consulta_pre_selecionada and consulta.id|stringformat:"s" == consulta_pre_selecionada %}selected{% endif %}>
+                                        {{ consulta.paciente.nome }} - {{ consulta.medico.nome }} - {{ consulta.data|date:"d/m/Y H:i" }} ({{ consulta.motivo|truncatechars:30 }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Nenhuma consulta disponível</strong><br>
+                                    Não há consultas em espera disponíveis para criar prontuário. 
+                                    {% if user.user_type == 'medico' %}
+                                        Verifique se há consultas suas em status "Em Espera".
+                                    {% else %}
+                                        Verifique se há consultas em status "Em Espera" no sistema.
+                                    {% endif %}
+                                    <br>
+                                    <a href="{% url 'consultas' %}" class="btn btn-sm btn-primary mt-2">
+                                        <i class="fas fa-calendar-check"></i> Ver Consultas
+                                    </a>
+                                </div>
+                                <input type="hidden" id="consulta" name="consulta" value="">
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row">
@@ -45,7 +63,11 @@
                     </div>
                     <div class="d-flex justify-content-end">
                         <a href="{% url 'prontuarios' %}" class="btn btn-secondary me-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Criar Prontuário</button>
+                        {% if consultas %}
+                            <button type="submit" class="btn btn-primary">Criar Prontuário</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-primary" disabled>Criar Prontuário</button>
+                        {% endif %}
                     </div>
                 </form>
             </div>
