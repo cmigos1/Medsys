@@ -38,30 +38,6 @@ O sistema conta com três níveis de acesso, cada um com suas próprias funciona
 - **Banco de Dados:** SQLite (configuração padrão, mas pode ser alterado)
 - **Controle de Versão:** Git e GitHub
 
-## Estrutura do Projeto
-
-Medsys/
-├── clinica/           # App principal com models, views e urls
-│   ├── migrations/
-│   ├── management/
-│   │   └── commands/
-│   └── ...
-├── prontuario/        # App de configuração do projeto Django
-├── static/            # Arquivos estáticos (CSS, JS)
-├── templates/         # Templates HTML do projeto
-│   ├── agenda/
-│   ├── auth/
-│   ├── consultas/
-│   ├── dashboard/
-│   ├── layouts/
-│   ├── pacientes/
-│   └── prontuario/
-├── .gitignore
-├── db.sqlite3
-├── manage.py
-└── requirements.txt
-
-
 ## ⚙️ Instalação e Execução
 
 Para executar o projeto localmente, siga os passos abaixo:
