@@ -25,7 +25,7 @@ O sistema conta com três níveis de acesso, cada um com suas próprias funciona
 - **Agenda:** Visualização da sua agenda de consultas.
 - **Impressão de Prontuários:** Geração de uma versão para impressão do prontuário do paciente.
 
-### 👥 Recepcionista
+### Recepcionista
 - **Dashboard focado na recepção:** Métricas como total de pacientes, consultas do dia, consultas pendentes e médicos ativos.
 - **Gestão de Pacientes:** Cadastro, edição e visualização de todos os pacientes da clínica.
 - **Gestão de Consultas:** Acesso a todas as consultas, podendo agendar, editar, cancelar e confirmar.
@@ -38,7 +38,7 @@ O sistema conta com três níveis de acesso, cada um com suas próprias funciona
 - **Banco de Dados:** SQLite (configuração padrão, mas pode ser alterado)
 - **Controle de Versão:** Git e GitHub
 
-## ⚙️ Instalação e Execução
+## Instalação e Execução
 
 Para executar o projeto localmente, siga os passos abaixo:
 
@@ -76,7 +76,7 @@ Para executar o projeto localmente, siga os passos abaixo:
 
 7.  Acesse o sistema em [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
-## 👥 Papéis e Permissões dos Usuários
+## Papéis e Permissões dos Usuários
 
 -   **Administrador:** Tem acesso irrestrito a todas as funcionalidades do sistema.
 -   **Médico:** Acessa apenas os dados de seus pacientes e consultas, garantindo a privacidade e a segurança das informações.
