@@ -1,1 +1,0 @@
-# Arquivo vazio - apenas para tornar o diretório um pacote Python

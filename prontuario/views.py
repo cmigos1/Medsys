@@ -622,19 +622,32 @@ def agenda(request):
     
     # Organizar consultas por dia para facilitar o template
     consultas_por_dia = {}
+    dias_semana = []
+    
     for i in range(7):
         data_dia = inicio_semana + timedelta(days=i)
-        consultas_por_dia[data_dia.strftime('%Y-%m-%d')] = []
+        data_str = data_dia.strftime('%Y-%m-%d')
+        consultas_por_dia[data_str] = []
+        dias_semana.append({
+            'data': data_dia,
+            'data_str': data_str,
+            'consultas': []
+        })
     
     # Agrupar consultas por dia
     for consulta in consultas_semana:
         data_str = consulta.data.strftime('%Y-%m-%d')
         if data_str in consultas_por_dia:
             consultas_por_dia[data_str].append(consulta)
+            # Também adicionar à lista de dias da semana
+            for dia in dias_semana:
+                if dia['data_str'] == data_str:
+                    dia['consultas'].append(consulta)
     
     context = {
         'stats': stats,
         'consultas_por_dia': consultas_por_dia,
+        'dias_semana': dias_semana,
         'consultas_semana': consultas_semana,
         'proximas_consultas': proximas_consultas,
         'inicio_semana': inicio_semana,
