@@ -1,70 +1,108 @@
+# Medsys - Sistema de Gestão de Clínicas
 
-# Medsys
+![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)
+![Django](https://img.shields.io/badge/Django-3.2%2B-green.svg)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow.svg)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-lightgrey.svg)
 
-**Medsys** é um sistema de prontuário eletrônico desenvolvido com Django, projetado para auxiliar clínicas e consultórios na gestão de pacientes, consultas e registros médicos.
+O **Medsys** é um sistema de gestão de clínicas e consultórios médicos, desenvolvido em Django, que visa otimizar e organizar o fluxo de trabalho de profissionais da saúde. A plataforma permite o gerenciamento completo de pacientes, agendamentos, prontuários eletrônicos e muito mais, com uma interface intuitiva e segura.
 
-## 🩺 Funcionalidades
+## Funcionalidades Principais
 
-- Cadastro e gerenciamento de pacientes
-- Registro de consultas e histórico médico
-- Interface web responsiva utilizando templates HTML
-- Banco de dados SQLite integrado
-- Scripts para popular a base de dados com informações de exemplo
+O sistema conta com três níveis de acesso, cada um com suas próprias funcionalidades:
 
-## 🚀 Tecnologias Utilizadas
+### Administrador
+- **Dashboard completo:** Visualização de todas as métricas do sistema, como total de pacientes, médicos, consultas do dia e prontuários.
+- **Gestão de Pacientes:** Cadastro, edição e visualização de todos os pacientes da clínica.
+- **Gestão de Consultas:** Acesso a todas as consultas, podendo agendar, editar, cancelar e confirmar.
+- **Gestão de Prontuários:** Acesso a todos os prontuários registrados no sistema.
+- **Painel de Administração do Django:** Acesso completo ao painel de administração para gerenciamento de usuários, especialidades, médicos e outros dados do sistema.
 
-- Python 3.x
-- Django
-- HTML/CSS
-- SQLite
+### Médico
+- **Dashboard personalizado:** Métricas focadas em suas atividades, como total de pacientes atendidos, consultas do dia, pacientes em espera e total de prontuários criados.
+- **Minhas Consultas:** Visualização e gerenciamento apenas das suas consultas.
+- **Meus Prontuários:** Cadastro, edição e visualização apenas dos prontuários de suas consultas.
+- **Agenda:** Visualização da sua agenda de consultas.
+- **Impressão de Prontuários:** Geração de uma versão para impressão do prontuário do paciente.
 
-## 📁 Estrutura do Projeto
+### 👥 Recepcionista
+- **Dashboard focado na recepção:** Métricas como total de pacientes, consultas do dia, consultas pendentes e médicos ativos.
+- **Gestão de Pacientes:** Cadastro, edição e visualização de todos os pacientes da clínica.
+- **Gestão de Consultas:** Acesso a todas as consultas, podendo agendar, editar, cancelar e confirmar.
+- **Agenda:** Visualização da agenda completa da clínica.
 
-```
+## Tecnologias Utilizadas
+
+- **Backend:** Python com o framework Django
+- **Frontend:** HTML5, CSS3, Bootstrap 5 e JavaScript
+- **Banco de Dados:** SQLite (configuração padrão, mas pode ser alterado)
+- **Controle de Versão:** Git e GitHub
+
+## Estrutura do Projeto
+
 Medsys/
-├── clinica/           # Aplicativo para gestão de dados da clínica
-├── prontuario/        # Aplicativo para registros médicos
-├── templates/         # Templates HTML para a interface do usuário
-├── static/            # Arquivos estáticos (CSS, JS, imagens)
-├── db.sqlite3         # Banco de dados SQLite
-├── manage.py          # Script de gerenciamento do Django
-├── populate_db.py     # Script para popular o banco de dados
-└── .vscode/           # Configurações do VSCode
-```
+├── clinica/           # App principal com models, views e urls
+│   ├── migrations/
+│   ├── management/
+│   │   └── commands/
+│   └── ...
+├── prontuario/        # App de configuração do projeto Django
+├── static/            # Arquivos estáticos (CSS, JS)
+├── templates/         # Templates HTML do projeto
+│   ├── agenda/
+│   ├── auth/
+│   ├── consultas/
+│   ├── dashboard/
+│   ├── layouts/
+│   ├── pacientes/
+│   └── prontuario/
+├── .gitignore
+├── db.sqlite3
+├── manage.py
+└── requirements.txt
 
-## ⚙️ Como Executar
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/cmigos1/Medsys.git
-   cd Medsys
-   ```
+## ⚙️ Instalação e Execução
 
-2. Crie e ative um ambiente virtual:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # No Windows: venv\Scripts\activate
-   ```
+Para executar o projeto localmente, siga os passos abaixo:
 
-3. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/cmigos1/Medsys.git](https://github.com/cmigos1/Medsys.git)
+    cd Medsys
+    ```
 
-4. Execute as migrações:
-   ```bash
-   python manage.py migrate
-   ```
+2.  **Crie e ative um ambiente virtual:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # No Windows: venv\Scripts\activate
+    ```
 
-5. (Opcional) Popule o banco de dados com dados de exemplo:
-   ```bash
-   python populate_db.py
-   ```
+3.  **Instale as dependências:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-6. Inicie o servidor de desenvolvimento:
-   ```bash
-   python manage.py runserver
-   ```
+4.  **Execute as migrações do banco de dados:**
+    ```bash
+    python manage.py migrate
+    ```
 
-7. Acesse o sistema em: [http://localhost:8000](http://localhost:8000)
+5.  **Crie um superusuário (administrador):**
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+6.  **Inicie o servidor de desenvolvimento:**
+    ```bash
+    python manage.py runserver
+    ```
+
+7.  Acesse o sistema em [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+
+## 👥 Papéis e Permissões dos Usuários
+
+-   **Administrador:** Tem acesso irrestrito a todas as funcionalidades do sistema.
+-   **Médico:** Acessa apenas os dados de seus pacientes e consultas, garantindo a privacidade e a segurança das informações.
+-   **Recepcionista:** Gerencia o fluxo de pacientes e agendamentos, mas não tem acesso aos detalhes clínicos dos prontuários.
 

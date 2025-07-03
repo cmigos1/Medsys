@@ -1181,3 +1181,4 @@ Bootstrap_Template_Ecommerce/bootstrap-ecommerce-html/sass/ui-assets/sections/_f
 Bootstrap_Template_Ecommerce/bootstrap-ecommerce-html/sass/ui-assets/sections/_header.scss
 Bootstrap_Template_Ecommerce/bootstrap-ecommerce-html/sass/ui-assets/sections/_sidebar.scss
 .vscode/
+populate_db.py
